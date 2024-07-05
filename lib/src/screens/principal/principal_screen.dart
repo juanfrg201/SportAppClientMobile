@@ -9,7 +9,7 @@ class PrincipalScreen extends StatelessWidget {
     return Scaffold(
       body: Column(
         children: [
-          HomeTopView(color: color, flex: 2),
+          HomeTopView(color: color, flex: 1),
           const HomeDownView(
             flex: 8,
             child: Padding(

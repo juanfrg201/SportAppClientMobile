@@ -8,7 +8,8 @@ class UserServices {
   static Future<bool> create(User user) async {
     final url = Uri.parse('$baseUrl/api/v1/user?name=${user.name}&last_name=${user.last_name}&email=${user.email}&password=${user.password}&password_confirmation=${user.password_confirmation}');
     final response = await http.post(
-      url // Llama a un método que convierte el objeto User en parámetros de consulta
+      url ,
+      headers: {'Content-Type': 'application/json'},// Llama a un método que convierte el objeto User en parámetros de consulta
     );
 
     if (response.statusCode == 201) {
