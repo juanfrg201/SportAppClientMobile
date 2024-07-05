@@ -12,7 +12,7 @@ class HomeScreen extends StatelessWidget {
       body: Column(
         children: [
           HomeTopView(color: color, flex: 4),
-          HomeDownView(
+          const HomeDownView(
             flex: 6,
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 40, vertical: 10),

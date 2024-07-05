@@ -15,14 +15,24 @@ class SessionsServices {
     );
 
     if (response.statusCode == 201) {
-      // Almacenar el estado de sesión utilizando SharedPreferences
+      // Parsear la respuesta JSON para obtener el ID del usuario
+      final responseData = jsonDecode(response.body);
+      final userId = responseData['id'];
+
+      // Almacenar el ID del usuario utilizando SharedPreferences
       final prefs = await SharedPreferences.getInstance();
-      prefs.setBool('isLoggedIn', true);
+      prefs.setInt('userId', userId);
 
       return true;
     } else {
-      print('Failed to create user: ${response.statusCode}');
+      print('Failed to create session: ${response.statusCode}');
       return false;
     }
+  }
+
+  static Future<void> deleteSession() async {
+    // Borrar el estado de sesión utilizando SharedPreferences
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('userId');
   }
 }

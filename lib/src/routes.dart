@@ -19,7 +19,7 @@ class AppRoutes {
       case register:
         return MaterialPageRoute(builder: (_) => RegisterScreen());
       case principal_screen:
-        return MaterialPageRoute(builder: (_) => PrincipalScreen());
+        return MaterialPageRoute(builder: (_) => const PrincipalScreen());
       default:
         return MaterialPageRoute(builder: (_) => HomeScreen());
     }
