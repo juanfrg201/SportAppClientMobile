@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Sport App',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
+        colorScheme: ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 254, 0, 0)),
         useMaterial3: true,
       ),
       onGenerateRoute: AppRoutes.generateRoute,
