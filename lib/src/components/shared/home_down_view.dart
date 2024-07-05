@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:sport_app/src/components/home/home_botton.dart';
-import 'package:sport_app/src/routes.dart';
 
 class HomeDownView extends StatelessWidget {
   final int flex;
@@ -18,11 +16,11 @@ class HomeDownView extends StatelessWidget {
     return Flexible(
       flex: flex,
       child: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: Colors.white,
         ),
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 40, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
           child: child,
         ),
       ),
