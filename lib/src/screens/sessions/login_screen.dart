@@ -98,7 +98,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(40.0), // Hace que el botón sea redondeado
                           ),
-                          backgroundColor: Colors.red, // Color de fondo rojo
+                          backgroundColor: color.primary, // Color de fondo rojo
                         ),
                         child: const Text('Iniciar Sesión', style: TextStyle(color: Colors.white),),
                       ),
