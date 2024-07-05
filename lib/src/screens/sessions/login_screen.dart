@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:sport_app/src/components/shared/home_down_view.dart';
 import 'package:sport_app/src/components/shared/home_top_view.dart';
+import 'package:sport_app/src/components/snack_bar/custom_snack_bar.dart';
+import 'package:sport_app/src/routes.dart';
+import 'package:sport_app/src/services/sessions_services.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -13,6 +16,29 @@ class _LoginScreenState extends State<LoginScreen> {
   // Form fields state
   String _email = '';
   String _password = '';
+
+  Future<void> _submitForm() async {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+
+      final newUser = await SessionsServices.create(_email, _password);
+
+      if (newUser) {
+        CustomSnackBar.show(
+          context,
+          'Logueado:',
+          Colors.green,
+        );
+        Navigator.pushNamedAndRemoveUntil(context, AppRoutes.principal_screen, (route) => false);
+      } else {
+        CustomSnackBar.show(
+          context,
+          'Error al loguearte',
+          Theme.of(context).errorColor,
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,14 +57,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: 25),
-                    Text(
+                   const Text(
                       'Inicio de Sesión',
                       style: TextStyle(
                         fontSize: 35,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     TextFormField(
                       decoration: InputDecoration(
                         labelText: 'Correo Electrónico',
@@ -58,7 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         _email = value!;
                       },
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     TextFormField(
                       obscureText: true,
                       decoration: InputDecoration(
@@ -79,28 +105,22 @@ class _LoginScreenState extends State<LoginScreen> {
                         _password = value!;
                       },
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            _formKey.currentState!.save();
-                            // Aquí puedes enviar los datos del formulario
-                            // por ejemplo, a través de una función de inicio de sesión
-                            // o a tu backend.
-                            // Ejemplo:
-                            // signInWithEmailAndPassword(_email, _password);
-                          }
-                        },
+                        onPressed: _submitForm,
                         style: ElevatedButton.styleFrom(
-                          padding: EdgeInsets.symmetric(vertical: 15), // Ajusta el padding vertical según tu diseño
+                          padding: const EdgeInsets.symmetric(vertical: 15), // Ajusta el padding vertical según tu diseño
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(40.0), // Hace que el botón sea redondeado
                           ),
                           backgroundColor: color.primary, // Color de fondo rojo
                         ),
-                        child: const Text('Iniciar Sesión', style: TextStyle(color: Colors.white),),
+                        child: const Text(
+                          'Inicia sesion',
+                          style: TextStyle(color: Colors.white),
+                        ),
                       ),
                     ),
                   ],
