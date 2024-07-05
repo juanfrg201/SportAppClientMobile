@@ -120,19 +120,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       },
                     ),
                     SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          _formKey.currentState!.save();
-                          // Aquí puedes enviar los datos del formulario
-                          // por ejemplo, a través de una función de registro
-                          // o a tu backend.
-                          // Ejemplo:
-                          // registerUser(_firstName, _lastName, _email, _password);
-                        }
-                      },
-                      child: Text('Registrarse'),
-                    ),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          if (_formKey.currentState!.validate()) {
+                            _formKey.currentState!.save();
+                            // Aquí puedes enviar los datos del formulario
+                            // por ejemplo, a través de una función de inicio de sesión
+                            // o a tu backend.
+                            // Ejemplo:
+                            // signInWithEmailAndPassword(_email, _password);
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.symmetric(vertical: 15), // Ajusta el padding vertical según tu diseño
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(40.0), // Hace que el botón sea redondeado
+                          ),
+                          backgroundColor: Colors.red, // Color de fondo rojo
+                        ),
+                        child: const Text('Registrate', style: TextStyle(color: Colors.white),),
+                      ),
+                    )
                   ],
                 ),
               ),
