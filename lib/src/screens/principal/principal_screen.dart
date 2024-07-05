@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sport_app/src/components/principal/new_rutine.dart';
 import 'package:sport_app/src/components/principal/profile_screen.dart';
 import 'package:sport_app/src/components/principal/rutine.dart';
 
@@ -43,7 +44,7 @@ class PrincipalScreen extends StatelessWidget {
           body: TabBarView(
             children: [
               Rutine(),
-              CreaTuRutina(),
+              NewRutine(),
               ProfileScreen(),
             ],
           ),
@@ -78,15 +79,6 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   @override
   bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
     return false;
-  }
-}
-
-class CreaTuRutina extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text("Contenido de Crea tu Rutina", textAlign: TextAlign.center),
-    );
   }
 }
 
