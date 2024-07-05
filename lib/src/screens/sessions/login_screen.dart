@@ -43,7 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       decoration: InputDecoration(
                         labelText: 'Correo Electrónico',
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.0),
+                          borderRadius: BorderRadius.circular(40.0),
                         ),
                         prefixIcon: Icon(Icons.email),
                       ),
@@ -64,7 +64,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       decoration: InputDecoration(
                         labelText: 'Contraseña',
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.0),
+                          borderRadius: BorderRadius.circular(40.0),
                         ),
                         prefixIcon: Icon(Icons.lock),
                       ),
