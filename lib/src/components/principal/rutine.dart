@@ -1,4 +1,10 @@
+// rutine.dart
+
 import 'package:flutter/material.dart';
+import 'package:sport_app/src/components/snack_bar/custom_snack_bar.dart';
+import 'package:sport_app/src/models/ejercice.dart';
+import 'package:sport_app/src/routes.dart';
+import 'package:sport_app/src/services/ejercicie_services.dart';
 
 class Rutine extends StatefulWidget {
   @override
@@ -6,77 +12,8 @@ class Rutine extends StatefulWidget {
 }
 
 class _RutineState extends State<Rutine> {
-  // Lista de ejercicios por día
-  List<List<Exercise>> exercises = [
-    [
-      Exercise(
-        name: "Flexiones de pecho",
-        imageUrl: "https://example.com/flexiones.jpg",
-        series: 3,
-        repetitions: 15,
-      ),
-      Exercise(
-        name: "Sentadillas",
-        imageUrl: "https://example.com/sentadillas.jpg",
-        series: 3,
-        repetitions: 20,
-      ),
-    ],
-    [
-      Exercise(
-        name: "Abdominales",
-        imageUrl: "https://example.com/abdominales.jpg",
-        series: 4,
-        repetitions: 25,
-      ),
-      Exercise(
-        name: "Plancha",
-        imageUrl: "https://example.com/plancha.jpg",
-        series: 3,
-        repetitions: 30,
-      ),
-    ],
-    [
-      Exercise(
-        name: "Estiramientos",
-        imageUrl: "https://example.com/estiramientos.jpg",
-        series: 2,
-        repetitions: 10,
-      ),
-    ],
-    [
-      Exercise(
-        name: "Carrera",
-        imageUrl: "https://example.com/carrera.jpg",
-        series: 1,
-        repetitions: 30,
-      ),
-    ],
-    [
-      Exercise(
-        name: "Natación",
-        imageUrl: "https://example.com/natacion.jpg",
-        series: 2,
-        repetitions: 25,
-      ),
-    ],
-    [
-      Exercise(
-        name: "Descanso",
-        imageUrl: "https://example.com/descanso.jpg",
-        series: 0,
-        repetitions: 0,
-      ),
-    ],
-    [
-      Exercise(
-        name: "Descanso",
-        imageUrl: "https://example.com/descanso.jpg",
-        series: 0,
-        repetitions: 0,
-      ),
-    ],
-  ];
+  // Lista de ejercicios para el día seleccionado
+  List<Ejercice> exercises = [];
 
   // Variable para almacenar el índice del día seleccionado
   int selectedDayIndex = -1;
@@ -89,23 +26,19 @@ class _RutineState extends State<Rutine> {
         // Row de tarjetas para los días de la semana
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            _buildDayCard(0),
-            _buildDayCard(1),
-            _buildDayCard(2),
-            _buildDayCard(3),
-            _buildDayCard(4),
-            _buildDayCard(5),
-            _buildDayCard(6),
-          ],
+          children: List.generate(7, (index) => _buildDayCard(index)),
         ),
         SizedBox(height: 20), // Espacio entre las tarjetas y el texto principal
         // Mostrar los ejercicios del día seleccionado si se ha seleccionado un día
         if (selectedDayIndex != -1)
-          Column(
-            children: exercises[selectedDayIndex]
-                .map((exercise) => _buildExerciseCard(exercise))
-                .toList(),
+          Expanded(
+            child: exercises.isEmpty
+                ? Center(child: Text('No hay ejercicios para este día.'))
+                : ListView(
+                    children: exercises
+                        .map((exercise) => _buildExerciseCard(exercise))
+                        .toList(),
+                  ),
           ),
       ],
     );
@@ -118,28 +51,20 @@ class _RutineState extends State<Rutine> {
         setState(() {
           // Actualizar el índice del día seleccionado
           selectedDayIndex = index;
+          fetchExercisesForDay(index);
         });
       },
       child: Card(
         color: selectedDayIndex == index ? Colors.blue[100] : Colors.white,
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
+          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center, // Centra el contenido horizontalmente
             children: [
               Container(
-                width: 3,
-                height: 50,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  image: DecorationImage(
-                    fit: BoxFit.cover,
-                    image: NetworkImage(
-                      exercises[index][0].imageUrl, // Usar la imagen del primer ejercicio
-                    ),
-                  ),
-                ),
+                width: 10,
+                height: 10,
               ),
-              SizedBox(width: 10),
               Text(
                 day,
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14), // Tamaño de fuente más pequeño
@@ -151,59 +76,63 @@ class _RutineState extends State<Rutine> {
     );
   }
 
-  Widget _buildExerciseCard(Exercise exercise) {
-  return Card(
-    margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-    child: Padding(
-      padding: const EdgeInsets.all(12.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              image: DecorationImage(
-                fit: BoxFit.cover,
-                image: NetworkImage(exercise.imageUrl),
+  Widget _buildExerciseCard(Ejercice exercise) {
+    return Card(
+      margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                image: DecorationImage(
+                  fit: BoxFit.cover,
+                  image: NetworkImage(exercise.image?.path ?? 'https://cdn-icons-png.flaticon.com/256/6478/6478052.png'),
+                ),
               ),
             ),
-          ),
-          SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      exercise.name,
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.delete),
-                      onPressed: () {
-                        // Aquí puedes implementar la lógica para eliminar el ejercicio
-                        // Por ejemplo, puedes mostrar un diálogo de confirmación
-                        // y luego actualizar la lista de ejercicios.
-                      },
-                    ),
-                  ],
-                ),
-                SizedBox(height: 5),
-                Text("Series: ${exercise.series}"),
-                Text("Repeticiones: ${exercise.repetitions}"),
-              ],
+            SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        exercise.name,
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.delete),
+                        onPressed: () async {
+                          final destroy_ejercicie = await EjerciceServices.destroy(exercise.id);
+                          if(destroy_ejercicie){
+                            Navigator.pushNamed(context, AppRoutes.principal_screen);
+                            CustomSnackBar.show(context, "Se elimino el ejercicio", Colors.green);
+                          }else{
+                            CustomSnackBar.show(context, "Se elimino el ejercicio", Colors.red);
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 5),
+                  Text("Series: ${exercise.series}"),
+                  Text("Repeticiones: ${exercise.repeticions}"),
+                  Text("Peso: ${exercise.weight} kg"),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
-}
-
+    );
+  }
 
   String _getDayName(int index) {
     switch (index) {
@@ -225,14 +154,17 @@ class _RutineState extends State<Rutine> {
         return "";
     }
   }
-}
 
-class Exercise {
-  final String name;
-  final String imageUrl;
-  final int series;
-  final int repetitions;
+  Future<void> fetchExercisesForDay(int day) async {
+    try {
+      List<Ejercice> fetchedExercises = await EjerciceServices.fetchExercises(1, day); // Reemplaza 1 con el ID del usuario actual
 
-  Exercise({required this.name, required this.imageUrl, required this.series, required this.repetitions});
+      setState(() {
+        exercises = fetchedExercises;
+      });
+    } catch (e) {
+      print(e);
+      // Manejo de errores
+    }
+  }
 }
- 

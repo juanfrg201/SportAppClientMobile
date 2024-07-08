@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sport_app/src/models/user.dart';
+import 'package:sport_app/src/services/user_services.dart';
 import 'package:sport_app/src/components/snack_bar/custom_snack_bar.dart';
 import 'package:sport_app/src/routes.dart';
 import 'package:sport_app/src/services/sessions_services.dart';
-import 'package:sport_app/src/services/user_services.dart'; // Asegúrate de agregar esta dependencia en pubspec.yaml
 
 class ProfileScreen extends StatefulWidget {
   @override
@@ -21,6 +19,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
+  User? _user;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUser();
+  }
+
+  Future<void> _fetchUser() async {
+    try {
+      final user = await UserServices.fetchUser(); // Reemplaza 1 con el ID del usuario actual
+      setState(() {
+        _user = user;
+        _nameController.text = user!.name;
+        _lastNameController.text = user.last_name;
+        _emailController.text = user.email;
+      });
+    } catch (e) {
+      print(e);
+      // Manejo de errores
+      CustomSnackBar.show(
+        context,
+        'Error al obtener el perfil del usuario',
+        Colors.red,
+      );
+    }
+  }
+
   void _toggleEdit() {
     setState(() {
       isEditing = !isEditing;
@@ -35,7 +61,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final String password = _passwordController.text;
 
       // Aquí puedes agregar la lógica para enviar los datos a la API
-      final updateUser = await UserServices.update(name , lastName, email, password);
+      final updateUser = await UserServices.update(name, lastName, email, password);
 
       if (updateUser) {
         // Si la respuesta es exitosa, puedes manejar la lógica aquí
@@ -90,35 +116,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildProfileInfo() {
     final color = Theme.of(context).colorScheme;
-    return Column(
-      children: [
-        // Aquí puedes agregar widgets para mostrar la información del perfil
-        SizedBox(height: 20),
-        ElevatedButton(
-          onPressed: () {
-            SessionsServices.deleteSession();
-            CustomSnackBar.show(
-              context,
-              'Cerraste sesión exitosamente',
-              Colors.green,
-            );
-            Navigator.pushNamed(context, AppRoutes.home);
-          },
-          style: ElevatedButton.styleFrom(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(40.0), // Hace que el botón sea redondeado
-            ),
-            backgroundColor: color.primary, // Color de fondo rojo
-            minimumSize: Size(200, 50), // Ajusta estos valores para hacer el botón más largo
-          ),
-          child: Text(
-            "Cerrar Sesión",
-            style: TextStyle(color: Colors.white),
-          ),
-        ),
-        // Otros campos de perfil
-      ],
-    );
+    return _user == null
+        ? Center(child: CircularProgressIndicator())
+        : Column(
+            children: [
+              // Aquí puedes agregar widgets para mostrar la información del perfil
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  SessionsServices.deleteSession();
+                  CustomSnackBar.show(
+                    context,
+                    'Cerraste sesión exitosamente',
+                    Colors.green,
+                  );
+                  Navigator.pushNamed(context, AppRoutes.home);
+                },
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(40.0), // Hace que el botón sea redondeado
+                  ),
+                  backgroundColor: color.primary, // Color de fondo rojo
+                  minimumSize: Size(200, 50), // Ajusta estos valores para hacer el botón más largo
+                ),
+                child: Text(
+                  "Cerrar Sesión",
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              // Otros campos de perfil
+            ],
+          );
   }
 
   Widget _buildEditForm() {

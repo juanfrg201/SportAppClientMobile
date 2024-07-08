@@ -1,7 +1,13 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
 import 'dart:io';
-import 'package:http/http.dart' as http;
+
+import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
+import 'package:sport_app/src/components/snack_bar/custom_snack_bar.dart';
+import 'package:sport_app/src/models/ejercice.dart';
+import 'package:sport_app/src/routes.dart';
+import 'package:sport_app/src/services/ejercicie_services.dart';
 
 class NewRutine extends StatefulWidget {
   @override
@@ -11,61 +17,58 @@ class NewRutine extends StatefulWidget {
 class _NewRutineState extends State<NewRutine> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  String _name = '';
-  int _series = 0;
-  int _repetitions = 0;
-  double _weight = 0.0;
+  String? _name;
+  int? _series;
+  int? _repetitions;
+  double? _weight;
   File? _image;
+  int? _day;
 
-  final ImagePicker _picker = ImagePicker();
-  
+  void _submitForm() async {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+
+      Ejercice newEjercice = Ejercice(
+        id: 0, // id temporal, se actualizará con el valor real al recibir la respuesta del servidor
+        name: _name!,
+        series: _series!,
+        repeticions: _repetitions!,
+        weight: _weight!,
+        day: _day!,
+        userId: 1, // Reemplaza con el ID real del usuario
+        image: _image,
+      );
+
+      final response = await EjerciceServices.create(newEjercice);
+
+      if (response != null) {
+        // Ejercicio creado con éxito
+        Navigator.pushNamedAndRemoveUntil(context, AppRoutes.principal_screen, (route) => false);
+        CustomSnackBar.show(
+          context,
+          'Se creo el ejercicio',
+          Colors.green,
+        );
+      
+      } else {
+        CustomSnackBar.show(
+          context,
+          'No se pudo crear el ejercicio',
+          Colors.red,
+        );
+    
+      }
+    }
+  }
 
   Future<void> _getImage() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
       setState(() {
         _image = File(pickedFile.path);
       });
-    }
-  }
-
-  Future<void> _submitForm() async {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
-
-    _formKey.currentState!.save();
-
-    // Aquí debes implementar la lógica para enviar los datos a tu API
-    // Reemplaza con tu lógica de API real
-    String apiUrl = 'tu_api/aqui';
-
-    // Ejemplo de cómo enviar datos con http.post (reemplaza según tu API)
-    try {
-      var request = http.MultipartRequest('POST', Uri.parse(apiUrl));
-      request.fields['name'] = _name;
-      request.fields['series'] = _series.toString();
-      request.fields['repetitions'] = _repetitions.toString();
-      request.fields['weight'] = _weight.toString();
-
-      if (_image != null) {
-        request.files.add(
-          await http.MultipartFile.fromPath('image', _image!.path),
-        );
-      }
-
-      var response = await request.send();
-      if (response.statusCode == 200) {
-        // Éxito, puedes manejar la respuesta aquí
-        print('Ejercicio registrado correctamente');
-      } else {
-        // Manejar errores de petición aquí
-        print('Error al registrar ejercicio: ${response.statusCode}');
-      }
-    } catch (e) {
-      // Manejar errores generales aquí
-      print('Error: $e');
     }
   }
 
@@ -79,96 +82,136 @@ class _NewRutineState extends State<NewRutine> {
         padding: EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              TextFormField(
-                decoration: InputDecoration(
-                  labelText: 'Nombre del ejercicio',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                TextFormField(
+                  decoration: InputDecoration(
+                    labelText: 'Nombre del ejercicio',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(40.0),
+                    ),
+                    prefixIcon: Icon(Icons.fitness_center),
                   ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor ingresa el nombre del ejercicio';
+                    }
+                    return null;
+                  },
+                  onSaved: (value) {
+                    _name = value!;
+                  },
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor ingresa el nombre del ejercicio';
-                  }
-                  return null;
-                },
-                onSaved: (value) {
-                  _name = value!;
-                },
-              ),
-              SizedBox(height: 12.0),
-              TextFormField(
-                decoration: InputDecoration(
-                  labelText: 'Series',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
+                SizedBox(height: 12.0),
+                TextFormField(
+                  decoration: InputDecoration(
+                    labelText: 'Series',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(40.0),
+                    ),
+                    prefixIcon: Icon(Icons.format_list_numbered),
                   ),
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor ingresa el número de series';
+                    }
+                    return null;
+                  },
+                  onSaved: (value) {
+                    _series = int.parse(value!);
+                  },
                 ),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor ingresa el número de series';
-                  }
-                  return null;
-                },
-                onSaved: (value) {
-                  _series = int.parse(value!);
-                },
-              ),
-              SizedBox(height: 12.0),
-              TextFormField(
-                decoration: InputDecoration(
-                  labelText: 'Repeticiones',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
+                SizedBox(height: 12.0),
+                TextFormField(
+                  decoration: InputDecoration(
+                    labelText: 'Repeticiones',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(40.0),
+                    ),
+                    prefixIcon: Icon(Icons.repeat),
                   ),
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor ingresa el número de repeticiones';
+                    }
+                    return null;
+                  },
+                  onSaved: (value) {
+                    _repetitions = int.parse(value!);
+                  },
                 ),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor ingresa el número de repeticiones';
-                  }
-                  return null;
-                },
-                onSaved: (value) {
-                  _repetitions = int.parse(value!);
-                },
-              ),
-              SizedBox(height: 12.0),
-              TextFormField(
-                decoration: InputDecoration(
-                  labelText: 'Peso (kg)',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
+                SizedBox(height: 12.0),
+                TextFormField(
+                  decoration: InputDecoration(
+                    labelText: 'Peso (kg)',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(40.0),
+                    ),
+                    prefixIcon: Icon(Icons.fitness_center),
                   ),
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor ingresa el peso utilizado';
+                    }
+                    return null;
+                  },
+                  onSaved: (value) {
+                    _weight = double.parse(value!);
+                  },
                 ),
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor ingresa el peso utilizado';
-                  }
-                  return null;
-                },
-                onSaved: (value) {
-                  _weight = double.parse(value!);
-                },
-              ),
-              SizedBox(height: 12.0),
-              ElevatedButton(
-                onPressed: _getImage,
-                child: Text('Seleccionar Imagen'),
-              ),
-              SizedBox(height: 12.0),
-              if (_image != null) Image.file(_image!),
-              SizedBox(height: 12.0),
-              ElevatedButton(
-                onPressed: _submitForm,
-                child: Text('Registrar Ejercicio'),
-              ),
-            ],
+                SizedBox(height: 12.0),
+                DropdownButtonFormField<int>(
+                  decoration: InputDecoration(
+                    labelText: 'Día de la semana',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(40.0),
+                    ),
+                    prefixIcon: Icon(Icons.calendar_today),
+                  ),
+                  items: [
+                    DropdownMenuItem(value: 0, child: Text('Lunes')),
+                    DropdownMenuItem(value: 1, child: Text('Martes')),
+                    DropdownMenuItem(value: 2, child: Text('Miércoles')),
+                    DropdownMenuItem(value: 3, child: Text('Jueves')),
+                    DropdownMenuItem(value: 4, child: Text('Viernes')),
+                    DropdownMenuItem(value: 5, child: Text('Sábado')),
+                    DropdownMenuItem(value: 6, child: Text('Domingo')),
+                  ],
+                  validator: (value) {
+                    if (value == null) {
+                      return 'Por favor selecciona un día';
+                    }
+                    return null;
+                  },
+                  onSaved: (value) {
+                    _day = value!;
+                  },
+                  onChanged: (value) {
+                    setState(() {
+                      _day = value;
+                    });
+                  },
+                ),
+                SizedBox(height: 12.0),
+                ElevatedButton(
+                  onPressed: _getImage,
+                  child: Text('Seleccionar Imagen'),
+                ),
+                SizedBox(height: 12.0),
+                if (_image != null) Image.file(_image!),
+                SizedBox(height: 12.0),
+                ElevatedButton(
+                  onPressed: _submitForm,
+                  child: Text('Registrar Ejercicio'),
+                ),
+              ],
+            ),
           ),
         ),
       ),

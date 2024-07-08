@@ -53,4 +53,14 @@ class UserServices {
       return false;
     }
   }
+
+  static Future<User?> fetchUser() async {
+    final response = await http.get(Uri.parse('$baseUrl/api/v1/user/7'));
+
+    if (response.statusCode == 200) {
+      return User.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception('Error al obtener el usuario');
+    }
+  }
 }

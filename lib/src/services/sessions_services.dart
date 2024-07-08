@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sport_app/src/helper/shared_preferences/shared_preferences_helper.dart';
 // Import correcto para el modelo Task
 
 class SessionsServices {
-  static const String baseUrl = 'http://10.0.2.2:3000';
+  static const String baseUrl = 'https://sportappservice.onrender.com';
 
   static Future<bool> create(String email, String password) async {
     final url = Uri.parse('$baseUrl/api/v1/sessions');
@@ -20,8 +21,8 @@ class SessionsServices {
       final userId = responseData['id'];
 
       // Almacenar el ID del usuario utilizando SharedPreferences
-      final prefs = await SharedPreferences.getInstance();
-      prefs.setInt('userId', userId);
+      await SharedPreferencesHelper.init();
+      await SharedPreferencesHelper.setUserId(userId);
 
       return true;
     } else {
