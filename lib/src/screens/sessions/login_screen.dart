@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:sport_app/src/components/shared/home_down_view.dart';
 import 'package:sport_app/src/components/shared/home_top_view.dart';
 import 'package:sport_app/src/components/snack_bar/custom_snack_bar.dart';
+import 'package:sport_app/src/helper/shared_preferences/shared_preferences_helper.dart';
 import 'package:sport_app/src/routes.dart';
 import 'package:sport_app/src/services/sessions_services.dart';
+ // Importa SharedPreferencesHelper
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -17,13 +19,26 @@ class _LoginScreenState extends State<LoginScreen> {
   String _email = '';
   String _password = '';
 
+  @override
+  void initState() {
+    super.initState();
+    _checkLoginStatus();
+  }
+
+  Future<void> _checkLoginStatus() async {
+    final userId = await SharedPreferencesHelper.verifyAndGetUserId();
+    if (userId != null) {
+      Navigator.pushReplacementNamed(context, AppRoutes.principal_screen);
+    }
+  }
+
   Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
       final newUser = await SessionsServices.create(_email, _password);
 
-      if (newUser) {
+      if (newUser != null) {
         CustomSnackBar.show(
           context,
           'Logueado:',
@@ -57,7 +72,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: 25),
-                   const Text(
+                    const Text(
                       'Inicio de Sesión',
                       style: TextStyle(
                         fontSize: 35,
@@ -133,3 +148,4 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
+

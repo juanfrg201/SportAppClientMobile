@@ -6,7 +6,7 @@ import 'package:sport_app/src/models/ejercice.dart';
 // Import correcto para el modelo Task
 
 class EjerciceServices {
-  static const String baseUrl = 'https://sportappservice.onrender.com';
+  static const String baseUrl = 'https://app-sport.onrender.com';
 
   static Future<Ejercice?> create(Ejercice ejercice) async {
     await SharedPreferencesHelper.init();

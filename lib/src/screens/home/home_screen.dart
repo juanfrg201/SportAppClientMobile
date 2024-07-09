@@ -2,9 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:sport_app/src/components/home/home_botton.dart';
 import 'package:sport_app/src/components/shared/home_down_view.dart';
 import 'package:sport_app/src/components/shared/home_top_view.dart';
+import 'package:sport_app/src/helper/shared_preferences/shared_preferences_helper.dart';
 import 'package:sport_app/src/routes.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+   @override
+  void initState() {
+    super.initState();
+    _checkLoginStatus();
+  }
+
+  Future<void> _checkLoginStatus() async {
+    final userId = await SharedPreferencesHelper.verifyAndGetUserId();
+    if (userId != null) {
+      Navigator.pushReplacementNamed(context, AppRoutes.principal_screen);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final color = Theme.of(context).colorScheme;

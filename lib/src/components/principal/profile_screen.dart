@@ -116,9 +116,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildProfileInfo() {
     final color = Theme.of(context).colorScheme;
-    return _user == null
-        ? Center(child: CircularProgressIndicator())
-        : Column(
+    return Column(
             children: [
               // Aquí puedes agregar widgets para mostrar la información del perfil
               SizedBox(height: 20),

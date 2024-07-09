@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sport_app/src/models/user.dart'; // Import correcto para el modelo Task
 
 class UserServices {
-  static const String baseUrl = 'http://10.0.2.2:3000/';
+  static const String baseUrl = 'https://app-sport.onrender.com';
 
   static Future<bool> create(User user) async {
     final url = Uri.parse('$baseUrl/api/v1/user?name=${user.name}&last_name=${user.last_name}&email=${user.email}&password=${user.password}&password_confirmation=${user.password_confirmation}');
@@ -55,7 +55,10 @@ class UserServices {
   }
 
   static Future<User?> fetchUser() async {
-    final response = await http.get(Uri.parse('$baseUrl/api/v1/user/7'));
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getInt('userId');
+
+    final response = await http.get(Uri.parse('$baseUrl/api/v1/user/$userId'));
 
     if (response.statusCode == 200) {
       return User.fromJson(jsonDecode(response.body));

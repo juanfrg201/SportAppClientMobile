@@ -5,7 +5,7 @@ import 'package:sport_app/src/helper/shared_preferences/shared_preferences_helpe
 // Import correcto para el modelo Task
 
 class SessionsServices {
-  static const String baseUrl = 'https://sportappservice.onrender.com';
+  static const String baseUrl = 'https://app-sport.onrender.com';
 
   static Future<bool> create(String email, String password) async {
     final url = Uri.parse('$baseUrl/api/v1/sessions');
